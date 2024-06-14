@@ -1,4 +1,4 @@
-import Header from "./Header";
+import Header from "../Components/Header";
 export default function ExpensesMain() {
   return (
     <main className="  bg-[#A29595] w-10/12 ">

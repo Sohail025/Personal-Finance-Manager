@@ -1,10 +1,13 @@
 import SideBar from "./Components/SideBar";
-import LoginMain from "./Components/LoginMain";
+import ExpensesMain from "./Pages/ExpensesMain";
+import { ContextProvider } from "./Contexts/ContextProvider";
 export default function App() {
   return (
-    <main className="flex flex-row">
-      <SideBar />
-      <LoginMain />
-    </main>
+    <ContextProvider>
+      <main className="flex flex-row">
+        <SideBar />
+        <ExpensesMain />
+      </main>
+    </ContextProvider>
   );
 }
