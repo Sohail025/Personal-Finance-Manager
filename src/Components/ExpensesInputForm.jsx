@@ -5,17 +5,9 @@ export default function ExpensesInputForm() {
     inputExpensesValue,
     dispatch,
     expensesInputHanlder,
-    itemExpense,
+    totalExpense,
   } = Context();
-  const totalExpense =
-    itemExpense.length > 1
-      ? itemExpense.reduce(
-          (pre, curr) =>
-            Number(pre.inputExpensesValue) + Number(curr.inputExpensesValue)
-        )
-      : itemExpense.length === 1
-      ? itemExpense[0].inputExpensesValue
-      : 0;
+
   return (
     <form className="flex flex-row justify-center gap-12 mt-5">
       <p className="bg-[#83A8A1] px-8 py-2 rounded">{`${totalExpense}$`}</p>

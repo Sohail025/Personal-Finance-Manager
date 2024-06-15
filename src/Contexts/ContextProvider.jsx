@@ -1,5 +1,6 @@
 import { useContext, useReducer } from "react";
 import { createContext } from "react";
+import { NavLink } from "react-router-dom";
 const startingValues = {
   inputIncomeLabel: "",
   inputIncomeValue: 0,
@@ -63,6 +64,29 @@ function ContextProvider({ children }) {
     },
     dispatch,
   ] = useReducer(reducer, startingValues);
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  const totalIncome =
+    incomeStreem.length > 1
+      ? incomeStreem.reduce(
+          (pre, curr) =>
+            Number(pre.inputIncomeValue) + Number(curr.inputIncomeValue)
+        )
+      : incomeStreem.length === 1
+      ? incomeStreem[0].inputIncomeValue
+      : 0;
+  const totalExpense =
+    itemExpense.length > 1
+      ? itemExpense.reduce(
+          (pre, curr) =>
+            Number(pre.inputExpensesValue) + Number(curr.inputExpensesValue)
+        )
+      : itemExpense.length === 1
+      ? itemExpense[0].inputExpensesValue
+      : 0;
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  const totalSavings = totalIncome - totalExpense;
   function incomeInputHanlder(e) {
     e.preventDefault();
     dispatch({
@@ -78,6 +102,11 @@ function ContextProvider({ children }) {
       payload: { inputExpensesLabel, inputExpensesValue },
     });
   }
+  //////////////////////////////////////////////////
+  // nav Links
+  // nav Links
+  //////////////////////////////////////////////////
+
   return (
     <postContext.Provider
       value={{
@@ -90,6 +119,9 @@ function ContextProvider({ children }) {
         expensesInputHanlder,
         incomeStreem,
         itemExpense,
+        totalIncome,
+        totalExpense,
+        totalSavings,
       }}
     >
       {children}

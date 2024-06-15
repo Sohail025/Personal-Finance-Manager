@@ -1,19 +1,23 @@
 import IncomeInputForm from "../Components/IncomeInputForm";
 import Header from "../Components/Header";
 import { Context } from "../Contexts/ContextProvider";
+import SideBar from "../Components/SideBar";
 export default function IncomeMain() {
   return (
-    <main className="  bg-[#A29595] w-10/12 ">
-      <div className="mt-3">
-        <Header>Income</Header>
-        <div className="flex justify-center items-center ">
-          <div className="bg-[#D9D9D9] h-[29rem] w-[64.5rem] mt-[1rem] rounded">
-            <IncomeInputForm />
-            <Item />
+    <>
+      <SideBar>Income</SideBar>
+      <main className="  bg-[#A29595] w-10/12 ">
+        <div className="mt-3">
+          <Header>Income</Header>
+          <div className="flex justify-center items-center ">
+            <div className="bg-[#D9D9D9] h-[29rem] w-[64.5rem] mt-[1rem] rounded">
+              <IncomeInputForm />
+              <Item />
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 function Item() {

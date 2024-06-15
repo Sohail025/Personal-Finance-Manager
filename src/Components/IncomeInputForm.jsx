@@ -5,17 +5,9 @@ export default function IncomeInputForm() {
     inputIncomeValue,
     dispatch,
     incomeInputHanlder,
-    incomeStreem,
+    totalIncome,
   } = Context();
-  const totalIncome =
-    incomeStreem.length > 1
-      ? incomeStreem.reduce(
-          (pre, curr) =>
-            Number(pre.inputIncomeValue) + Number(curr.inputIncomeValue)
-        )
-      : incomeStreem.length === 1
-      ? incomeStreem[0].inputIncomeValue
-      : 0;
+
   return (
     <form className="flex flex-row justify-center gap-12 mt-5">
       <p className="bg-[#83A8A1] px-8 py-2 rounded">{`${totalIncome}$`}</p>
