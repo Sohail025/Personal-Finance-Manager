@@ -1,6 +1,6 @@
-import { useContext, useReducer } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import { createContext } from "react";
-import { NavLink } from "react-router-dom";
+import { get, set } from "idb-keyval";
 const startingValues = {
   inputIncomeLabel: "",
   inputIncomeValue: 0,
@@ -47,6 +47,16 @@ function reducer(state, action) {
         inputExpensesLabel: "",
         inputExpensesValue: 0,
       };
+    case "getInocmeFromStorage":
+      return {
+        ...state,
+        incomeStreem: action.payload,
+      };
+    case "getExpensesFromStorage":
+      return {
+        ...state,
+        itemExpense: action.payload,
+      };
     default:
       return state;
   }
@@ -64,36 +74,41 @@ function ContextProvider({ children }) {
     },
     dispatch,
   ] = useReducer(reducer, startingValues);
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    const dataGetter = async () => {
+      const incomeData = await get("income");
+      const expensesData = await get("expenses");
+      if (incomeData)
+        dispatch({ type: "getInocmeFromStorage", payload: incomeData });
+      if (expensesData)
+        dispatch({ type: "getExpensesFromStorage", payload: expensesData });
+    };
+    dataGetter();
+  }, []);
+  ///////////////////////////////////////////////////////////////////////////////////
   const totalIncome =
-    incomeStreem.length > 1
-      ? incomeStreem.reduce(
-          (pre, curr) =>
-            Number(pre.inputIncomeValue) + Number(curr.inputIncomeValue)
-        )
-      : incomeStreem.length === 1
-      ? incomeStreem[0].inputIncomeValue
+    incomeStreem.length > 0
+      ? incomeStreem.reduce((total, item) => {
+          return total + Number(item.inputIncomeValue);
+        }, 0)
       : 0;
   const totalExpense =
-    itemExpense.length > 1
-      ? itemExpense.reduce(
-          (pre, curr) =>
-            Number(pre.inputExpensesValue) + Number(curr.inputExpensesValue)
-        )
-      : itemExpense.length === 1
-      ? itemExpense[0].inputExpensesValue
+    itemExpense.length > 0
+      ? itemExpense.reduce((total, item) => {
+          return total + Number(item.inputExpensesValue);
+        }, 0)
       : 0;
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
+  console.log(totalExpense);
   const totalSavings = totalIncome - totalExpense;
+  ///////////////////////////////////////////////////////////
   function incomeInputHanlder(e) {
     e.preventDefault();
+
     dispatch({
       type: "incomeInputHanlder",
       payload: { inputIncomeLabel, inputIncomeValue, key: crypto.randomUUID() },
     });
-    dispatch({ type: "clearSearchField" });
+    set("income", [...incomeStreem, { inputIncomeLabel, inputIncomeValue }]);
   }
   function expensesInputHanlder(e) {
     e.preventDefault();
@@ -102,11 +117,6 @@ function ContextProvider({ children }) {
       payload: { inputExpensesLabel, inputExpensesValue },
     });
   }
-  //////////////////////////////////////////////////
-  // nav Links
-  // nav Links
-  //////////////////////////////////////////////////
-
   return (
     <postContext.Provider
       value={{

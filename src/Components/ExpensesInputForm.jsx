@@ -7,17 +7,16 @@ export default function ExpensesInputForm() {
     expensesInputHanlder,
     totalExpense,
   } = Context();
-
   return (
-    <form className="flex flex-row justify-center gap-12 mt-5">
-      <p className="bg-[#83A8A1] px-8 py-2 rounded">{`${totalExpense}$`}</p>
-      <div className="flex gap-3">
+    <form className="flex flex-row justify-center lg:gap-12 lg:mt-5 gap-4 mt-8">
+      <p className="bg-[#83A8A1] lg:px-8 lg:py-2 rounded px-2 sm:px-4 text-center sm:pt-2">{`${totalExpense}$`}</p>
+      <div className="flex lg:gap-3 gap-4">
         <input
           value={inputExpensesValue}
           onChange={(e) =>
             dispatch({ type: "inputExpensesValue", payload: e.target.value })
           }
-          className="rounded"
+          className="rounded w-10 border-[#000000] border-[0.1rem] text-center"
           placeholder="Value $"
           type="number"
           required
@@ -28,7 +27,7 @@ export default function ExpensesInputForm() {
             dispatch({ type: "inputExpensesLabel", payload: e.target.value })
           }
           type="text"
-          className="w-96 rounded"
+          className="lg:w-96 rounded border-[#000000] border-[0.1rem] indent-2 sm:w-80 sm:h-10"
           placeholder="Enter new Item"
           required
         ></input>
@@ -36,7 +35,7 @@ export default function ExpensesInputForm() {
       <button
         disabled={!(inputExpensesValue && inputExpensesValue)}
         onClick={expensesInputHanlder}
-        className="bg-[#83A8A1] px-5 py-2 rounded"
+        className="bg-[#83A8A1] lg:px-5 lg:py-2 rounded px-1.5 text-[0.7rem] sm:px-5 sm:text-[1rem]"
       >
         Submit
       </button>

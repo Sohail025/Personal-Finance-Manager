@@ -6,11 +6,10 @@ import SavingsMain from "./Pages/SavingsMain";
 import LoginMain from "./Pages/LoginMain";
 import { ContextProvider } from "./Contexts/ContextProvider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 export default function App() {
   return (
     <ContextProvider>
-      <main className="flex flex-row">
+      <div className="flex lg:flex-row flex-col">
         <BrowserRouter>
           <Routes>
             <Route index element={<Home />} />
@@ -21,7 +20,7 @@ export default function App() {
             <Route path="/Login" element={<LoginMain />} />
           </Routes>
         </BrowserRouter>
-      </main>
+      </div>
     </ContextProvider>
   );
 }
