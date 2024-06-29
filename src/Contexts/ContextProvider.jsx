@@ -1,6 +1,21 @@
 import { useContext, useEffect, useReducer } from "react";
 import { createContext } from "react";
 import { get, set } from "idb-keyval";
+
+const fakeIncomeStreem = [
+  { inputIncomeLabel: "Sallery", inputIncomeValue: 500 },
+  { inputIncomeLabel: "Rent of House 1", inputIncomeValue: 500 },
+  { inputIncomeLabel: "Rent of House 2", inputIncomeValue: 1000 },
+  { inputIncomeLabel: "Rent of House 3", inputIncomeValue: 1000 },
+  { inputIncomeLabel: "Rent of Shop", inputIncomeValue: 1000 },
+];
+const fakeExpenseStreem = [
+  { inputIncomeLabel: "Grocery", inputIncomeValue: 200 },
+  { inputIncomeLabel: "College Fee", inputIncomeValue: 300 },
+  { inputIncomeLabel: "Clothes", inputIncomeValue: 200 },
+  { inputIncomeLabel: "Party", inputIncomeValue: 500 },
+  { inputIncomeLabel: "Travel", inputIncomeValue: 500 },
+];
 const startingValues = {
   inputIncomeLabel: "",
   inputIncomeValue: 0,
@@ -8,6 +23,8 @@ const startingValues = {
   inputExpensesValue: 0,
   incomeStreem: [],
   itemExpense: [],
+  fakeDataStatus: true,
+  HistoryData: [],
 };
 function reducer(state, action) {
   switch (action.type) {
@@ -36,14 +53,15 @@ function reducer(state, action) {
     case "incomeInputHanlder":
       return {
         ...state,
-        incomeStreem: [...state.incomeStreem, action.payload],
+        incomeStreem: [...state.incomeStreem, action.payload1],
         inputIncomeLabel: "",
         inputIncomeValue: 0,
+        HistoryData: [{ Monthlyincome: action.payload2 }],
       };
     case "expensesInputHanlder":
       return {
         ...state,
-        itemExpense: [...state.itemExpense, action.payload],
+        itemExpense: [...state.itemExpense, action.payload1],
         inputExpensesLabel: "",
         inputExpensesValue: 0,
       };
@@ -56,6 +74,11 @@ function reducer(state, action) {
       return {
         ...state,
         itemExpense: action.payload,
+      };
+    case "clearFakeData":
+      return {
+        ...state,
+        fakeDataStatus: false,
       };
     default:
       return state;
@@ -71,6 +94,7 @@ function ContextProvider({ children }) {
       inputExpensesValue,
       incomeStreem,
       itemExpense,
+      fakeDataStatus,
     },
     dispatch,
   ] = useReducer(reducer, startingValues);
@@ -98,15 +122,22 @@ function ContextProvider({ children }) {
           return total + Number(item.inputExpensesValue);
         }, 0)
       : 0;
-  console.log(totalExpense);
   const totalSavings = totalIncome - totalExpense;
-  ///////////////////////////////////////////////////////////
+  const fakeIncome = 4000;
+  const fakeExpense = 1700;
+  const fakeSavings = 6200;
+  const thisMonth = new Date().toLocaleString("en-US", { month: "long" });
+  const thisYear = new Date().getFullYear();
   function incomeInputHanlder(e) {
     e.preventDefault();
-
     dispatch({
       type: "incomeInputHanlder",
-      payload: { inputIncomeLabel, inputIncomeValue, key: crypto.randomUUID() },
+      payload: {
+        inputIncomeLabel,
+        inputIncomeValue,
+        key: crypto.randomUUID(),
+      },
+      payload2: { totalIncome },
     });
     set("income", [...incomeStreem, { inputIncomeLabel, inputIncomeValue }]);
   }
@@ -114,9 +145,21 @@ function ContextProvider({ children }) {
     e.preventDefault();
     dispatch({
       type: "expensesInputHanlder",
-      payload: { inputExpensesLabel, inputExpensesValue },
+      payload1: {
+        inputExpensesLabel,
+        inputExpensesValue,
+        key: crypto.randomUUID(),
+      },
+      payload2: { totalExpense },
     });
+    set("expenses", [
+      ...itemExpense,
+      { inputExpensesLabel, inputExpensesValue, thisMonth, thisYear },
+    ]);
   }
+  const FakeDataHandler = () => {
+    dispatch({ type: "clearFakeData" });
+  };
   return (
     <postContext.Provider
       value={{
@@ -132,6 +175,15 @@ function ContextProvider({ children }) {
         totalIncome,
         totalExpense,
         totalSavings,
+        thisMonth,
+        thisYear,
+        fakeIncomeStreem,
+        fakeExpenseStreem,
+        FakeDataHandler,
+        fakeDataStatus,
+        fakeIncome,
+        fakeExpense,
+        fakeSavings,
       }}
     >
       {children}

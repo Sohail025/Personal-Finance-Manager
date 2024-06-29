@@ -1,4 +1,4 @@
-import Home from "./Pages/Home";
+import Home from "./Pages/LoginMain";
 import DashBoardMain from "./Pages/DashboardMain";
 import IncomeMain from "./Pages/IncomeMain";
 import ExpensesMain from "./Pages/ExpensesMain";
@@ -12,7 +12,7 @@ export default function App() {
       <div className="flex lg:flex-row flex-col">
         <BrowserRouter>
           <Routes>
-            <Route index element={<Home />} />
+            <Route index element={<LoginMain />} />
             <Route path="/Dashboard" element={<DashBoardMain />} />
             <Route path="/Income" element={<IncomeMain />} />
             <Route path="/Expenses" element={<ExpensesMain />} />
