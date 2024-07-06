@@ -21,7 +21,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <SideBar CUclass={"mt-[45.5rem] lg:hidden"} />
+      <SideBar gclass={"mt-[45.5rem] lg:hidden"} />
     </>
   );
 }

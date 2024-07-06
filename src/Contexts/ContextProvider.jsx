@@ -1,89 +1,17 @@
 import { useContext, useEffect, useReducer } from "react";
 import { createContext } from "react";
-import { get, set } from "idb-keyval";
-
-const fakeIncomeStreem = [
-  { inputIncomeLabel: "Sallery", inputIncomeValue: 500 },
-  { inputIncomeLabel: "Rent of House 1", inputIncomeValue: 500 },
-  { inputIncomeLabel: "Rent of House 2", inputIncomeValue: 1000 },
-  { inputIncomeLabel: "Rent of House 3", inputIncomeValue: 1000 },
-  { inputIncomeLabel: "Rent of Shop", inputIncomeValue: 1000 },
-];
-const fakeExpenseStreem = [
-  { inputIncomeLabel: "Grocery", inputIncomeValue: 200 },
-  { inputIncomeLabel: "College Fee", inputIncomeValue: 300 },
-  { inputIncomeLabel: "Clothes", inputIncomeValue: 200 },
-  { inputIncomeLabel: "Party", inputIncomeValue: 500 },
-  { inputIncomeLabel: "Travel", inputIncomeValue: 500 },
-];
-const startingValues = {
-  inputIncomeLabel: "",
-  inputIncomeValue: 0,
-  inputExpensesLabel: "",
-  inputExpensesValue: 0,
-  incomeStreem: [],
-  itemExpense: [],
-  fakeDataStatus: true,
-  HistoryData: [],
-};
-function reducer(state, action) {
-  switch (action.type) {
-    ///////////////////////////////
-    case "inputIncomeValue":
-      return {
-        ...state,
-        inputIncomeValue: action.payload,
-      };
-    case "inputIncomeLabel":
-      return {
-        ...state,
-        inputIncomeLabel: action.payload,
-      };
-    /////////////////////////////////
-    case "inputExpensesValue":
-      return {
-        ...state,
-        inputExpensesValue: action.payload,
-      };
-    case "inputExpensesLabel":
-      return {
-        ...state,
-        inputExpensesLabel: action.payload,
-      };
-    case "incomeInputHanlder":
-      return {
-        ...state,
-        incomeStreem: [...state.incomeStreem, action.payload1],
-        inputIncomeLabel: "",
-        inputIncomeValue: 0,
-        HistoryData: [{ Monthlyincome: action.payload2 }],
-      };
-    case "expensesInputHanlder":
-      return {
-        ...state,
-        itemExpense: [...state.itemExpense, action.payload1],
-        inputExpensesLabel: "",
-        inputExpensesValue: 0,
-      };
-    case "getInocmeFromStorage":
-      return {
-        ...state,
-        incomeStreem: action.payload,
-      };
-    case "getExpensesFromStorage":
-      return {
-        ...state,
-        itemExpense: action.payload,
-      };
-    case "clearFakeData":
-      return {
-        ...state,
-        fakeDataStatus: false,
-      };
-    default:
-      return state;
-  }
-}
+import { set, get } from "idb-keyval";
+import { reducer } from "./Reducer";
+import { SumCalc } from "../Hooks/SumCalc";
+import { ChartArray } from "../Hooks/ChartArray";
+import {
+  startingValues,
+  thisMonth,
+  incomeStorageKey,
+  expenseStorageKey,
+  historyDataKey,
+  Labels,
+} from "./Variables";
 const postContext = createContext();
 function ContextProvider({ children }) {
   const [
@@ -95,39 +23,84 @@ function ContextProvider({ children }) {
       incomeStreem,
       itemExpense,
       fakeDataStatus,
+      historyData,
     },
     dispatch,
   ] = useReducer(reducer, startingValues);
+
+  const [totalIncome] = SumCalc(incomeStreem);
+  const [totalExpense] = SumCalc(itemExpense);
+  const totalSavings = totalIncome - totalExpense;
+  const newHistoryItemStatus =
+    historyData.length > 0
+      ? Boolean(historyData.find((item) => item.thisMonth === thisMonth))
+      : false;
+  ///////////////////////////////////////////////////
+  const totalIncomeArray = historyData.map((item) => item.totalIncome);
+  const totalExpenseArray = historyData.map((item) => item.totalExpense);
+  const totalSavingsArray = historyData.map(
+    (item) => item.totalIncome - item.totalExpense
+  );
+  const currMonth = Labels.findIndex(
+    (item) => item === historyData[0]?.thisMonth
+  );
+  const [zeroArrary] = ChartArray(currMonth);
+  const incomeArray = [...zeroArrary, ...totalIncomeArray];
+  const expenseArray = [...zeroArrary, ...totalExpenseArray];
+  const savingsArray = [...zeroArrary, ...totalSavingsArray];
+
+  const dataGetter = async () => {
+    const incomeData = await get(incomeStorageKey);
+    const expensesData = await get(expenseStorageKey);
+    const storedHistoryData = await get(historyDataKey);
+    if (incomeData)
+      dispatch({ type: "getInocmeFromStorage", payload: incomeData });
+    if (expensesData)
+      dispatch({ type: "getExpensesFromStorage", payload: expensesData });
+    if (storedHistoryData)
+      dispatch({ type: "FirsthistoryData", payload: storedHistoryData });
+  };
   useEffect(() => {
-    const dataGetter = async () => {
-      const incomeData = await get("income");
-      const expensesData = await get("expenses");
-      if (incomeData)
-        dispatch({ type: "getInocmeFromStorage", payload: incomeData });
-      if (expensesData)
-        dispatch({ type: "getExpensesFromStorage", payload: expensesData });
-    };
     dataGetter();
   }, []);
-  ///////////////////////////////////////////////////////////////////////////////////
-  const totalIncome =
-    incomeStreem.length > 0
-      ? incomeStreem.reduce((total, item) => {
-          return total + Number(item.inputIncomeValue);
-        }, 0)
-      : 0;
-  const totalExpense =
-    itemExpense.length > 0
-      ? itemExpense.reduce((total, item) => {
-          return total + Number(item.inputExpensesValue);
-        }, 0)
-      : 0;
-  const totalSavings = totalIncome - totalExpense;
-  const fakeIncome = 4000;
-  const fakeExpense = 1700;
-  const fakeSavings = 6200;
-  const thisMonth = new Date().toLocaleString("en-US", { month: "long" });
-  const thisYear = new Date().getFullYear();
+  const UpdateCurrMonthValues = () => {
+    const currMonthData = historyData.find(
+      (item) => item.thisMonth === thisMonth
+    );
+    if (currMonthData) {
+      currMonthData.totalIncome = totalIncome + Number(inputIncomeValue);
+      currMonthData.totalExpense = totalExpense + Number(inputExpensesValue);
+    }
+    set(historyDataKey, [...historyData]);
+  };
+  const ValuesResseter = () => {
+    set(historyDataKey, []);
+    set(incomeStorageKey, []);
+    set(expenseStorageKey, []);
+  };
+  // ValuesResseter();
+  const HistorydataSetter = () => {
+    if (!newHistoryItemStatus) {
+      dispatch({
+        type: "historyData",
+        payload: {
+          thisMonth,
+          totalIncome: totalIncome + Number(inputIncomeValue),
+          totalExpense: totalExpense + Number(inputExpensesValue),
+        },
+      });
+    }
+    const finaltotalInocme = totalIncome + Number(inputIncomeValue);
+    console.log(totalIncome + Number(inputIncomeValue));
+    set(historyDataKey, [
+      ...historyData,
+      {
+        thisMonth,
+        totalIncome: finaltotalInocme,
+        totalExpense: totalExpense + Number(inputExpensesValue),
+      },
+    ]);
+  };
   function incomeInputHanlder(e) {
     e.preventDefault();
     dispatch({
@@ -137,25 +110,30 @@ function ContextProvider({ children }) {
         inputIncomeValue,
         key: crypto.randomUUID(),
       },
-      payload2: { totalIncome },
     });
-    set("income", [...incomeStreem, { inputIncomeLabel, inputIncomeValue }]);
+    set(incomeStorageKey, [
+      ...incomeStreem,
+      { inputIncomeLabel, inputIncomeValue },
+    ]);
+    HistorydataSetter();
+    UpdateCurrMonthValues();
   }
   function expensesInputHanlder(e) {
     e.preventDefault();
     dispatch({
       type: "expensesInputHanlder",
-      payload1: {
+      payload: {
         inputExpensesLabel,
         inputExpensesValue,
         key: crypto.randomUUID(),
       },
-      payload2: { totalExpense },
     });
-    set("expenses", [
+    set(expenseStorageKey, [
       ...itemExpense,
-      { inputExpensesLabel, inputExpensesValue, thisMonth, thisYear },
+      { inputExpensesLabel, inputExpensesValue },
     ]);
+    HistorydataSetter();
+    UpdateCurrMonthValues();
   }
   const FakeDataHandler = () => {
     dispatch({ type: "clearFakeData" });
@@ -176,14 +154,11 @@ function ContextProvider({ children }) {
         totalExpense,
         totalSavings,
         thisMonth,
-        thisYear,
-        fakeIncomeStreem,
-        fakeExpenseStreem,
+        incomeArray,
+        expenseArray,
+        savingsArray,
         FakeDataHandler,
         fakeDataStatus,
-        fakeIncome,
-        fakeExpense,
-        fakeSavings,
       }}
     >
       {children}

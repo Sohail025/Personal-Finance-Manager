@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import SidebarItem from "./SidebarItem";
 
-export default function SideBar({ CUclass }) {
+export default function SideBar({ gclass }) {
   return (
     <div
-      className={`  bg-[#D9D9D9] lg:w-2/12 lg:h-screen w-screen h-1/6 ${CUclass} pl-10 fixed lg:relative sm:mt-[50rem] lg:mt-0`}
+      className={`fixed bottom-0 left-0 right-0 h-20 z-10 bg-[#D9D9D9] lg:w-2/12 lg:h-screen lg:relative sm:mt-[50rem] lg:mt-0 ${gclass} `}
     >
-      <div className="lg:ml-[1rem] lg:flex lg:flex-col lg:gap-7 lg:justify-center hidden">
+      <div className=" hidden lg:block ml-14">
         <Link to={"/"}>
           <img
             className="lg:ml-1"
@@ -14,36 +15,17 @@ export default function SideBar({ CUclass }) {
           />
         </Link>
       </div>
-      <div className="flex lg:gap-2 lg:flex-col lg:justify-center flex-row lg:mt-12 items-center justify-center gap-7 lg:mr-10">
+      <div className="flex lg:gap-2 lg:flex-col lg:justify-center flex-row lg:mt-12 items-center justify-evenly w-screen lg:w-full">
+        <SidebarItem>Dashboard</SidebarItem>
+        <SidebarItem>Income</SidebarItem>
+        <SidebarItem>Savings</SidebarItem>
+        <SidebarItem>Expenses</SidebarItem>
         <Link
-          to={"/Dashboard"}
-          className="bg-[#5c8462] lg:py-3 rounded lg:w-40 px-[0.2rem] py-[0.1rem] text-[1rem] mt-5 text-center sm:text-[1.5rem] sm:px-2 lg:text-[1rem]"
+          className="hidden lg:block bg-[#e9545d] mt-10 px-7 py-2 rounded-lg text-white font-bold"
+          to={"/login"}
         >
-          Dashboard
+          Login
         </Link>
-        <Link
-          to={"/Income"}
-          className="bg-[#5c8462] lg:py-3 rounded lg:w-40 px-[0.2rem] py-[0.1rem] text-[1rem] mt-5 text-center sm:text-[1.5rem] sm:px-2 lg:text-[1rem]"
-        >
-          Income
-        </Link>
-        <Link
-          to={"/Expenses"}
-          className="bg-[#5c8462] lg:py-3 rounded lg:w-40 px-[0.2rem] py-[0.1rem] text-[1rem] mt-5 text-center sm:text-[1.5rem] sm:px-2 lg:text-[1rem]"
-        >
-          Expenses
-        </Link>
-        <Link
-          to={"/Savings"}
-          className="bg-[#5c8462] rounded lg:py-3 lg:w-40 px-[0.2rem] py-[0.1rem] text-[1rem] mt-5 text-center sm:text-[1.5rem] sm:px-2 lg:text-[1rem]"
-        >
-          Savings
-        </Link>
-        <div className="lg:mt-[2rem] lg:py-3 lg:w-28 bg-[#3852a1]  rounded-[2rem] text-center text-[#ffff] lg:text-[1rem]">
-          <Link className="hidden lg:block" to={"/login"}>
-            Login
-          </Link>
-        </div>
       </div>
     </div>
   );
