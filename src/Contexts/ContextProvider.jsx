@@ -91,7 +91,6 @@ function ContextProvider({ children }) {
       });
     }
     const finaltotalInocme = totalIncome + Number(inputIncomeValue);
-    console.log(totalIncome + Number(inputIncomeValue));
     set(historyDataKey, [
       ...historyData,
       {
@@ -108,12 +107,12 @@ function ContextProvider({ children }) {
       payload: {
         inputIncomeLabel,
         inputIncomeValue,
-        key: crypto.randomUUID(),
+        id: crypto.randomUUID(),
       },
     });
     set(incomeStorageKey, [
       ...incomeStreem,
-      { inputIncomeLabel, inputIncomeValue },
+      { inputIncomeLabel, inputIncomeValue, id: crypto.randomUUID() },
     ]);
     HistorydataSetter();
     UpdateCurrMonthValues();
@@ -125,16 +124,27 @@ function ContextProvider({ children }) {
       payload: {
         inputExpensesLabel,
         inputExpensesValue,
-        key: crypto.randomUUID(),
+        id: crypto.randomUUID(),
       },
     });
     set(expenseStorageKey, [
       ...itemExpense,
-      { inputExpensesLabel, inputExpensesValue },
+      { inputExpensesLabel, inputExpensesValue, id: crypto.randomUUID() },
     ]);
     HistorydataSetter();
     UpdateCurrMonthValues();
   }
+  const itemRemoveHandler = (id) => {
+    const filterdIncomeStreeem = incomeStreem.filter((item) => item.id !== id);
+    const filterdExpenseStreeem = itemExpense.filter((item) => item.id !== id);
+    dispatch({
+      type: "filteredData",
+      payload1: filterdIncomeStreeem,
+      payload2: filterdExpenseStreeem,
+    });
+    set(incomeStorageKey, filterdIncomeStreeem);
+    set(expenseStorageKey, filterdExpenseStreeem);
+  };
   const FakeDataHandler = () => {
     dispatch({ type: "clearFakeData" });
   };
@@ -159,6 +169,7 @@ function ContextProvider({ children }) {
         savingsArray,
         FakeDataHandler,
         fakeDataStatus,
+        itemRemoveHandler,
       }}
     >
       {children}

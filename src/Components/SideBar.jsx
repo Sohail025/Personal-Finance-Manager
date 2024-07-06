@@ -9,7 +9,7 @@ export default function SideBar({ gclass }) {
       <div className=" hidden lg:block ml-14">
         <Link to={"/"}>
           <img
-            className="lg:ml-1"
+            className="lg:ml-1 laz"
             src="https://img.icons8.com/stickers/100/bank-card-dollar.png"
             alt="bank-card-dollar"
           />

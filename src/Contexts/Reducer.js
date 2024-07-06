@@ -34,6 +34,12 @@ export function reducer(state, action) {
         inputExpensesLabel: "",
         inputExpensesValue: 0,
       };
+    case "filteredData":
+      return {
+        ...state,
+        incomeStreem: action.payload1,
+        itemExpense: action.payload2,
+      };
     case "getInocmeFromStorage":
       return {
         ...state,
